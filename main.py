@@ -1,4 +1,3 @@
-from MapInfo import MapInfo
 from Game import Game
 from DBManager import Base, osuMap
 from flask import Flask, render_template, url_for
@@ -21,14 +20,11 @@ from sqlalchemy import create_engine, select, func, column
 
 
 app = Flask(__name__)
-engine = create_engine("sqlite+pysqlite:///instance/db.sqlite3", echo=True, future=True)
+engine = create_engine("sqlite+pysqlite:///instance/db.sqlite3", future=True)
 Base.metadata.create_all(bind=engine, checkfirst=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 alltitles = [title for title, in session.query(osuMap.title)]
-
-
-
 
 @app.route("/")
 def index():

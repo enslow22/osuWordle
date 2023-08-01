@@ -9,10 +9,6 @@
 <script>
     score = 6
 
-    function unlockButton(){
-        {}
-    }
-
     function changeHint(element){
         document.querySelectorAll('video').forEach(vid => vid.pause());
         for (var i = 0; i<6; i++){
@@ -26,12 +22,19 @@
 
     // Unlock hints and add button to start a new game
     function finishGame(){
-
-
+        hints = document.getElementsByClassName("btn btn-primary");
+        for (let i = 0; i < hints.length; i++){
+            hints[i].disabled = false;
+        }
+        restartButton = document.getElementById("restart-button");
+        restartButton.style.display = "inline";
     }
 
     function submitAnswer(element){
-        answer = document.getElementById("answer-box").value
+        answerBox = document.getElementById("answer-box")
+        answer = answerBox.value
+        answerBox.value = ""
+
         if (answer === "{{ game.solution | safe }}"){
             alert("CONGRATS! You guessed it in ".concat(6-score, " tries"))
             finishGame()
@@ -41,6 +44,7 @@
             //Unlock the next button
             if (score == 0){
                 alert("LOSER! The answer was ".concat("{{ game.solution }}"))
+                finishGame()
             }
             else{
                 nextButton = document.getElementById("b".concat(String(6-score)));
@@ -49,9 +53,14 @@
         }
     }
 
-
-
-
+    function restartGame(){
+        hints = document.getElementsByClassName("btn btn-primary");
+        for (let i = 0; i < hints.length; i++){
+            hints[i].disabled = true;
+        }
+        hints[0].disabled = false;
+        location.reload()
+    }
 </script>
 
 {% endblock %}
@@ -121,6 +130,7 @@
       source: maplist
     });
     </script>
+    <button id="restart-button" class="restart-button" onclick="restartGame()" style="display: none">restart!</button>
 </div>
 
 
