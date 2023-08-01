@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link href="https://vjs.zencdn.net/8.3.0/video-js.css" rel="stylesheet" />
+<script defer src="https://vjs.zencdn.net/8.3.0/video.min.js"></script>
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+<script>
+    score = 6
+
+    function unlockButton(){
+        {}
+    }
+
+    function changeHint(element){
+        document.querySelectorAll('video').forEach(vid => vid.pause());
+        for (var i = 0; i<6; i++){
+            if (i == element.id.slice(-1)){
+                document.getElementById("h".concat(String(i))).style.display = "block";
+                continue;
+            }
+            document.getElementById("h".concat(String(i))).style.display = "none"
+        }
+    }
+
+    // Unlock hints and add button to start a new game
+    function finishGame(){
+
+
+    }
+
+    function submitAnswer(element){
+        answer = document.getElementById("answer-box").value
+        if (answer === "{{ game.solution | safe }}"){
+            alert("CONGRATS! You guessed it in ".concat(6-score, " tries"))
+            finishGame()
+        }
+        else{
+            score -= 1;
+            //Unlock the next button
+            if (score == 0){
+                alert("LOSER! The answer was ".concat("{{ game.solution }}"))
+            }
+            else{
+                nextButton = document.getElementById("b".concat(String(6-score)));
+                nextButton.disabled = false;
+            }
+        }
+    }
+
+
+
+
+</script>
+
+{% endblock %}
+
+
+{% block body %}
+
+<div class="active-window">
+    <div id="h0" class="video-hint">
+        <h2>Hint 1</h2>
+        <video controls onloadstart="this.volume=0.3" height="540" width="960" class="video-js" data-setup="{}">
+            <source src="{{ game.hint0['mp4_url_name'] }}" type="application/x-mpegURL">
+        </video>
+    </div>
+    <div id="h1" class="video-hint" style="display: none;">
+        <h2>Hint 2</h2>
+        <video controls onloadstart="this.volume=0.3" height="540" width="960" class="video-js" data-setup="{}">
+            <source src="{{ game.hint1['mp4_url_name'] }}" type="application/x-mpegURL">
+        </video>
+    </div>
+    <div id="h2" class="stats-hint" style="display: none;">
+        <h2>Hint 3</h2>
+        <h1>Length: {{ game.hint2['map_length'] }}</h1>
+        <h1>Star Rating: {{ game.hint2['star_rating'] }}</h1>
+        <h1>Language: {{ game.hint2['language'] }}</h1>
+        <h1>Genre: {{ game.hint2['genre'] }}</h1>
+    </div>
+    <div id="h3" class="mapper-hint" style="display: none;">
+        <h2>Hint 4</h2>
+        <img src="{{ game.hint3['mapper_avatar'] }}">
+        <h1>{{ game.hint3['mapper_name'] }}</h1>
+        {% if game.hint3['previous_names']|length > 0 %}
+        <h2>Also known as:</h2>
+            {%for name in game.hint3['previous_names']%}
+                <h3>{{ name }}</h3>
+            {%endfor%}
+        {% endif %}
+    </div>
+    <div id="h4" class="img-hint" style="display: none;">
+        <h2>Hint 5</h2>
+        <img src="{{ game.hint4['bg'] }}">
+    </div>
+    <div id="h5" class="video-hint" style="display: none;">
+        <h2>Hint 6</h2>
+        <video controls onloadstart="this.volume=0.3" height="540" width="960" class="video-js"  data-setup="{}">
+            <source src="{{ game.hint5['mp4_url_name'] }}" type="application/x-mpegURL">
+        </video>
+    </div>
+</div>
+
+<br>
+<div class="hint-selector">
+    <button id="b0" class="btn btn-primary" onclick="changeHint(this)">1</button>
+    <button id="b1" class="btn btn-primary" onclick="changeHint(this)" disabled>2</button>
+    <button id="b2" class="btn btn-primary" onclick="changeHint(this)" disabled>3</button>
+    <button id="b3" class="btn btn-primary" onclick="changeHint(this)" disabled>4</button>
+    <button id="b4" class="btn btn-primary" onclick="changeHint(this)" disabled>5</button>
+    <button id="b5" class="btn btn-primary" onclick="changeHint(this)" disabled>6</button>
+</div>
+<br>
+<div class="guess-area">
+    <input class="main-text" id="answer-box">
+    <button id="submit-button" class="submit-button" onclick="submitAnswer(this)">Submit</button>
+    <script>
+    const maplist = {{maptitles|tojson}}
+    $( "#answer-box" ).autocomplete({
+      source: maplist
+    });
+    </script>
+</div>
+
+
+{% endblock %}
